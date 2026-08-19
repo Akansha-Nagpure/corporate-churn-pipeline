@@ -25,3 +25,24 @@ raw_data = {
 df = pd.DataFrame(raw_data)
 print(f"Dataset successfully created with {df.shape[0]} rows and {df.shape[1]} features.")
 print(df.head(3))
+
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+print("\n--- Starting Checkpoint 3: Feature Engineering & NLP Vectorization ---")
+
+# Initialize the NLP tool to keep the top 5 most meaningful words
+tfidf = TfidfVectorizer(max_features=5, stop_words='english')
+
+# Convert customer text reviews into numerical scoring arrays
+feedback_features = tfidf.fit_transform(df['CustomerFeedback']).toarray()
+
+# Convert the math array into a clean DataFrame structure
+feedback_df = pd.DataFrame(feedback_features, columns=[f"nlp_{word}" for word in tfidf.get_feature_names_out()])
+
+# Combine the numerical customer data with the new text feature data
+X_features = pd.concat([df[['TenureMonths', 'MonthlyCharges']], feedback_df], axis=1)
+y_target = df['Churn']
+
+print("Engineered Feature Matrix (X) Sample with NLP columns:")
+print(X_features.head(3))
