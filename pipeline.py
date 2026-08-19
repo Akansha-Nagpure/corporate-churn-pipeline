@@ -1,3 +1,6 @@
+# 1. Data Simulation and ETL Pipeline
+# To generate realistic corporate data. This represents the Extract, Transform, Load (ETL) phase.
+
 import pandas as pd
 import numpy as np
 
@@ -26,7 +29,8 @@ df = pd.DataFrame(raw_data)
 print(f"Dataset successfully created with {df.shape[0]} rows and {df.shape[1]} features.")
 print(df.head(3))
 
-
+# 2. Feature Engineering and NLP Vectorization
+# In this step we transform text data into math vectors using an NLP technique called TF-IDF
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 print("\n--- Starting Checkpoint 3: Feature Engineering & NLP Vectorization ---")
@@ -46,3 +50,32 @@ y_target = df['Churn']
 
 print("Engineered Feature Matrix (X) Sample with NLP columns:")
 print(X_features.head(3))
+
+# 3. Model Training and Metric Evaluation
+# In this step we split data, normalize scales, train a Random Forest model, and print performance metrics.
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+
+print("\n--- Starting Checkpoint 4: ML Training & Assessment ---")
+
+# 1. Split data into training data (75%) and evaluation testing data (25%)
+X_train, X_test, y_train, y_test = train_test_split(X_features, y_target, test_size=0.25, random_state=42, stratify=y_target)
+
+# 2. Standardize data scales so charges and months balance out mathematically
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# 3. Train the ensemble classification model
+classifier = RandomForestClassifier(n_estimators=50, random_state=42)
+classifier.fit(X_train_scaled, y_train)
+
+# 4. Generate predictions and evaluate accuracy
+predictions = classifier.predict(X_test_scaled)
+print(f"Final Model Prediction Accuracy Score: {accuracy_score(y_test, predictions) * 100:.2f}%")
+print("\nDetailed Performance Matrix Summary:")
+print(classification_report(y_test, predictions))
+
